@@ -70,7 +70,6 @@
         android:id="@+id/consoleTextView"
         android:layout_width="330dp"
         android:layout_height="224dp"
-        android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"

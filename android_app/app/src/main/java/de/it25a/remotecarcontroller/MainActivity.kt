@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var consoleTextView: TextView;
-
     private lateinit var infoTextView: TextView;
 
     private lateinit var upButton: Button;
@@ -35,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Find the Elements, store them in the class-Variabeles
         consoleTextView = findViewById(R.id.consoleTextView);
         consoleData = LinkedList()
 
@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         leftButton = findViewById(R.id.leftButton);
         rightButton = findViewById(R.id.rightButton);
 
+        // Create the OnTouchListener: Getting triggered, when user touches the Button
         upButton.setOnTouchListener { _, motionEvent ->
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -69,7 +70,6 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_UP -> {
                     customPrint("Down Button release")
                     doButtonPress(Direction.Down, motionEvent)
-
                 }
             }
             true
@@ -79,13 +79,11 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Left Button press")
                     doButtonPress(Direction.Left, motionEvent)
-
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Left Button release")
                     doButtonPress(Direction.Left, motionEvent)
-
                 }
             }
             true
@@ -100,17 +98,15 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_UP -> {
                     customPrint("Right Button release")
                     doButtonPress(Direction.Right, motionEvent)
-
                 }
             }
             true
         }
-        customPrint("Hello World!");
     }
 
-    private fun customPrint(value: Any?): Boolean {
-        println(value);
-
+    // Custom Print, to get Debug-output while the app is running
+    // Remove when app is fully done
+    private fun customPrint(value: Any?, color: Int?) {
         consoleData.add(value.toString())
         if (consoleData.size > 10) {
             consoleData.removeFirst()
@@ -118,39 +114,47 @@ class MainActivity : AppCompatActivity() {
 
         var consoleString = "";
         for (s in consoleData) {
-            consoleString += s + "\n"
+            consoleString += s + "\n";
         }
-        consoleTextView.text = consoleString
-        return true
+        if(color != null) {
+            consoleTextView.setTextColor(color);
+        } else {
+            consoleTextView.setTextColor(Color.WHITE);
+        }
+        consoleTextView.text = consoleString;
+    }
+    private fun customPrint(value: Any?) {
+        customPrint(value, null);
     }
 
+    // Handle the Buttons. Send data via BT here later
     fun doButtonPress(direction: Direction, motionEvent: MotionEvent) {
-        customPrint(direction.toString())
         when (direction) {
             Direction.Up -> {
-                infoTextView.setTextColor(Color.MAGENTA)
+                infoTextView.setTextColor(Color.MAGENTA);
             }
 
             Direction.Down -> {
-                infoTextView.setTextColor(Color.YELLOW)
+                infoTextView.setTextColor(Color.YELLOW);
             }
 
             Direction.Left -> {
-                infoTextView.setTextColor(Color.RED)
+                infoTextView.setTextColor(Color.RED);
             }
 
             Direction.Right -> {
-                infoTextView.setTextColor(Color.GREEN)
+                infoTextView.setTextColor(Color.GREEN);
             }
 
             else -> {
-                println("that should not happen. WTF?")
+                println("that should not happen. WTF?");
+                customPrint("ERROR: that should not happen. WTF?", Color.RED);
             }
         }
         if (motionEvent.action == MotionEvent.ACTION_UP) {
-            infoTextView.text = ""
+            infoTextView.text = "";
         } else {
-            infoTextView.text = direction.toString()
+            infoTextView.text = direction.toString();
         }
     }
 }
