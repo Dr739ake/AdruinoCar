@@ -1,54 +1,156 @@
 package de.it25a.remotecarcontroller
 
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintSet.Motion
+import java.util.LinkedList
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var firstTextView_obj: TextView;
-    private lateinit var klickMeButton_obj: Button;
+    enum class Direction {
+        Up,
+        Down,
+        Left,
+        Right
+    }
 
-    private lateinit var infoTextView_obj: TextView;
+    private lateinit var consoleTextView: TextView;
 
-    private lateinit var upButton_obj: Button;
-    private lateinit var downButton_obj: Button;
-    private lateinit var leftButton_obj: Button;
-    private lateinit var rightButton_obj: Button;
+    private lateinit var infoTextView: TextView;
 
+    private lateinit var upButton: Button;
+    private lateinit var downButton: Button;
+    private lateinit var leftButton: Button;
+    private lateinit var rightButton: Button;
+    private lateinit var consoleData: LinkedList<String>;
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        firstTextView_obj = findViewById(R.id.firstTextView);
-        klickMeButton_obj = findViewById(R.id.klickMeButton);
+        consoleTextView = findViewById(R.id.consoleTextView);
+        consoleData = LinkedList()
 
-        klickMeButton_obj.setOnClickListener {
-            firstTextView_obj.text = "Hello World!";
-        };
+        infoTextView = findViewById(R.id.infoTextView);
 
-        infoTextView_obj = findViewById(R.id.infoTextView);
+        upButton = findViewById(R.id.upButton);
+        downButton = findViewById(R.id.downButton);
+        leftButton = findViewById(R.id.leftButton);
+        rightButton = findViewById(R.id.rightButton);
 
-        upButton_obj = findViewById(R.id.upButton);
-        downButton_obj = findViewById(R.id.downButton);
-        leftButton_obj = findViewById(R.id.leftButton);
-        rightButton_obj = findViewById(R.id.rightButton);
+        upButton.setOnTouchListener { _, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    customPrint("Up Button press")
+                    doButtonPress(Direction.Up, motionEvent)
+                }
 
-        upButton_obj.setOnClickListener {
-            infoTextView_obj.text = "up";
-        };
-        downButton_obj.setOnClickListener {
-            infoTextView_obj.text = "down";
-        };
-        leftButton_obj.setOnClickListener {
-            infoTextView_obj.text = "left";
-        };
-        rightButton_obj.setOnClickListener {
-            infoTextView_obj.text = "right";
-        };
-        
+                MotionEvent.ACTION_UP -> {
+                    customPrint("Up Button release")
+                    doButtonPress(Direction.Up, motionEvent)
+                }
+            }
+            true
+        }
+        downButton.setOnTouchListener { _, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    customPrint("Down Button press")
+                    doButtonPress(Direction.Down, motionEvent)
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    customPrint("Down Button release")
+                    doButtonPress(Direction.Down, motionEvent)
+
+                }
+            }
+            true
+        }
+        leftButton.setOnTouchListener { _, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    customPrint("Left Button press")
+                    doButtonPress(Direction.Left, motionEvent)
+
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    customPrint("Left Button release")
+                    doButtonPress(Direction.Left, motionEvent)
+
+                }
+            }
+            true
+        }
+        rightButton.setOnTouchListener { _, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    customPrint("Right Button press")
+                    doButtonPress(Direction.Right, motionEvent)
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    customPrint("Right Button release")
+                    doButtonPress(Direction.Right, motionEvent)
+
+                }
+            }
+            true
+        }
+        customPrint("Hello World!");
+    }
+
+    private fun customPrint(value: Any?): Boolean {
+        println(value);
+
+        consoleData.add(value.toString())
+        if (consoleData.size > 10) {
+            consoleData.removeFirst()
+        }
+
+        var consoleString = "";
+        for (s in consoleData) {
+            consoleString += s + "\n"
+        }
+        consoleTextView.text = consoleString
+        return true
+    }
+
+    fun doButtonPress(direction: Direction, motionEvent: MotionEvent) {
+        customPrint(direction.toString())
+        when (direction) {
+            Direction.Up -> {
+                infoTextView.setTextColor(Color.MAGENTA)
+            }
+
+            Direction.Down -> {
+                infoTextView.setTextColor(Color.YELLOW)
+            }
+
+            Direction.Left -> {
+                infoTextView.setTextColor(Color.RED)
+            }
+
+            Direction.Right -> {
+                infoTextView.setTextColor(Color.GREEN)
+            }
+
+            else -> {
+                println("that should not happen. WTF?")
+            }
+        }
+        if (motionEvent.action == MotionEvent.ACTION_UP) {
+            infoTextView.text = ""
+        } else {
+            infoTextView.text = direction.toString()
+        }
     }
 }
