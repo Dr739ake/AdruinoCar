@@ -1,0 +1,16 @@
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\bin\Debug\net6.0-windows\RemoteCarControll.exe
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\bin\Debug\net6.0-windows\RemoteCarControll.deps.json
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\bin\Debug\net6.0-windows\RemoteCarControll.runtimeconfig.json
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\bin\Debug\net6.0-windows\RemoteCarControll.dll
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\bin\Debug\net6.0-windows\RemoteCarControll.pdb
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.Form1.resources
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.csproj.GenerateResource.cache
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.AssemblyInfoInputs.cache
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.AssemblyInfo.cs
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.csproj.CoreCompileInputs.cache
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.dll
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\refint\RemoteCarControll.dll
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.pdb
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\RemoteCarControll.genruntimeconfig.cache
+C:\Users\Jonas\Desktop\EVP_projekt\windows_app\RemoteCarControll\RemoteCarControll\obj\Debug\net6.0-windows\ref\RemoteCarControll.dll
