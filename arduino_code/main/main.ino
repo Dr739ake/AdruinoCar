@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h> 
 SoftwareSerial MyBlue(2, 3); // RX | TX 
 
-int flag = 0; 
+char flag = 0; 
 int LED = 8; 
 
 void setup() 
@@ -15,15 +15,19 @@ void setup()
 void loop() 
 { 
  if (MyBlue.available()) 
-   flag = MyBlue.read(); 
- if (flag == 1) 
+  {
+    flag = MyBlue.read();
+    Serial.println("Flag is: ");
+    Serial.println(flag);
+  }
+ if (flag == '1') 
  { 
    digitalWrite(LED, HIGH); 
-   Serial.println("LED On"); 
+   //Serial.println("LED On"); 
  } 
- else if (flag == 0) 
+ else if (flag == '0') 
  { 
    digitalWrite(LED, LOW); 
-   Serial.println("LED Off"); 
+   //Serial.println("LED Off"); 
  } 
 }
