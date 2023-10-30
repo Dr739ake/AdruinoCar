@@ -17,6 +17,16 @@ void setup() {
   pinMode(LED_LEFT, OUTPUT);
   pinMode(LED_RIGHT, OUTPUT);
   Serial.println("Ready to connect");
+
+  digitalWrite(LED_UP, HIGH);
+  digitalWrite(LED_DOWN, HIGH);
+  digitalWrite(LED_LEFT, HIGH);
+  digitalWrite(LED_RIGHT, HIGH);
+  delay(1000);
+  digitalWrite(LED_UP, LOW);
+  digitalWrite(LED_DOWN, LOW);
+  digitalWrite(LED_LEFT, LOW);
+  digitalWrite(LED_RIGHT, LOW);
 }
 
 void loop() {
@@ -28,7 +38,7 @@ void loop() {
       return;
     }
   }
-  
+  Serial.println(cmd);
   if (cmd == "+up") {
     Serial.println("+up");
     digitalWrite(LED_UP, HIGH);
