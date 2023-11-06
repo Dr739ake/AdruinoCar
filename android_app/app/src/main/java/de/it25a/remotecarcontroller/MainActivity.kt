@@ -1,24 +1,28 @@
 package de.it25a.remotecarcontroller
 
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import android.Manifest
-import android.content.Context
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.LinkedList
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,16 +43,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var consoleData: LinkedList<String>;
     private lateinit var pairedDevices: Set<BluetoothDevice>;
 
-    var bt: BluetoothAdapter? = null
-    var bts: BluetoothSocket? = null
     val REQUEST_BLUETOOTH_PERMISSION: Int = 1
     val REQUEST_BLUETOOTH_ENABLE: Int = 2
+
+    private lateinit var outputStream: OutputStream;
+    private lateinit var inStream: InputStream;
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
         {
@@ -59,18 +63,38 @@ class MainActivity : AppCompatActivity() {
             ).show();
             return;
         }
+        val blueAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        bt = BluetoothAdapter.getDefaultAdapter()
-        if (bt == null) {
-            // This device does not have Bluetooth.
-            Toast.makeText(
-                getApplicationContext(),
-                "Device does not have a Bluetooth adapter therefore this application cannot run.",
-                Toast.LENGTH_SHORT
-            ).show();
-            return;
+        if (blueAdapter != null) {
+            if (blueAdapter.isEnabled) {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) != PackageManager.PERMISSION_GRANTED) {
+                    return
+                }
+                val bondedDevices = blueAdapter.bondedDevices
+                if (bondedDevices.size > 0) {
+                    val devices = bondedDevices.toTypedArray() as Array<BluetoothDevice>
+                    var device: BluetoothDevice
+                    for(BD: BluetoothDevice in devices) {
+                        if(BD.address == "00:21:06:BE:5D:C5")
+                        {
+                            device = BD;
+                            val uuids = device.uuids
+                            val socket = device.createRfcommSocketToServiceRecord(uuids[0].uuid)
+
+                            socket.connect()
+                            outputStream = socket.outputStream
+                            inStream = socket.inputStream
+                        }
+                    }
+                }
+                Log.e("error", "No appropriate paired devices.")
+            } else {
+                Log.e("error", "Bluetooth is disabled.")
+            }
         }
-        bluetoothConnect();
 
         // Find the Elements, store them in the class-Variabeles
         consoleTextView = findViewById(R.id.consoleTextView);
@@ -142,41 +166,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun bluetoothConnect() {
-        val CONTEXT: Context = this;
-
-        if (ContextCompat.checkSelfPermission(
-                CONTEXT,
-                Manifest.permission.BLUETOOTH
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-
-            if (bt?.isEnabled == false) {
-                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                startActivityForResult(enableBtIntent, REQUEST_BLUETOOTH_ENABLE)
-            } else {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.BLUETOOTH_CONNECT),
-                    REQUEST_BLUETOOTH_PERMISSION
-                )
-                pairedDevices = bt?.bondedDevices!!
-                pairedDevices?.forEach { device ->
-                    val deviceName = device.name
-                    val deviceHardwareAddress = device.address // MAC address
-                }
-            }
-        }
-        else {
-            // Request permission. That will call back to onActivityResult which in the case of success will call this method again.
-            // Ask for permission.
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.BLUETOOTH),
-                REQUEST_BLUETOOTH_PERMISSION
-            )
-        }
-    }
     // Custom Print, to get Debug-output while the app is running
     // Remove when app is fully done
     private fun customPrint(value: Any?, color: Int?) {
@@ -202,21 +191,30 @@ class MainActivity : AppCompatActivity() {
 
     // Handle the Buttons. Send data via BT here later
     fun doButtonPress(direction: Direction, motionEvent: MotionEvent) {
+        val cmd: String;
         when (direction) {
             Direction.Up -> {
                 infoTextView.setTextColor(Color.MAGENTA);
+                cmd = "up"
+                outputStream.write(("+"+cmd+";").toByteArray());
             }
 
             Direction.Down -> {
                 infoTextView.setTextColor(Color.YELLOW);
+                cmd = "down"
+                outputStream.write(("+"+cmd+";").toByteArray());
             }
 
             Direction.Left -> {
                 infoTextView.setTextColor(Color.RED);
+                cmd = "left"
+                outputStream.write(("+"+cmd+";").toByteArray());
             }
 
             Direction.Right -> {
                 infoTextView.setTextColor(Color.GREEN);
+                cmd = "right"
+                outputStream.write(("+"+cmd+";").toByteArray());
             }
 
             else -> {
