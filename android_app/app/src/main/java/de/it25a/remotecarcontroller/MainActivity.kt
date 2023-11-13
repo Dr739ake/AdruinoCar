@@ -36,15 +36,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var consoleTextView: TextView;
     private lateinit var infoTextView: TextView;
 
+    private lateinit var connectionInfoView: TextView;
+    private lateinit var reconnectButton: Button;
+
     private lateinit var upButton: Button;
     private lateinit var downButton: Button;
     private lateinit var leftButton: Button;
     private lateinit var rightButton: Button;
     private lateinit var consoleData: LinkedList<String>;
-    private lateinit var pairedDevices: Set<BluetoothDevice>;
-
-    val REQUEST_BLUETOOTH_PERMISSION: Int = 1
-    val REQUEST_BLUETOOTH_ENABLE: Int = 2
 
     private lateinit var outputStream: OutputStream;
     private lateinit var inStream: InputStream;
@@ -63,49 +62,29 @@ class MainActivity : AppCompatActivity() {
             ).show();
             return;
         }
-        val blueAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        if (blueAdapter != null) {
-            if (blueAdapter.isEnabled) {
-                if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.BLUETOOTH_CONNECT
-                    ) != PackageManager.PERMISSION_GRANTED) {
-                    return
-                }
-                val bondedDevices = blueAdapter.bondedDevices
-                if (bondedDevices.size > 0) {
-                    val devices = bondedDevices.toTypedArray() as Array<BluetoothDevice>
-                    var device: BluetoothDevice
-                    for(BD: BluetoothDevice in devices) {
-                        if(BD.address == "00:21:06:BE:5D:C5")
-                        {
-                            device = BD;
-                            val uuids = device.uuids
-                            val socket = device.createRfcommSocketToServiceRecord(uuids[0].uuid)
-
-                            socket.connect()
-                            outputStream = socket.outputStream
-                            inStream = socket.inputStream
-                        }
-                    }
-                }
-                Log.e("error", "No appropriate paired devices.")
-            } else {
-                Log.e("error", "Bluetooth is disabled.")
-            }
-        }
 
         // Find the Elements, store them in the class-Variabeles
         consoleTextView = findViewById(R.id.consoleTextView);
         consoleData = LinkedList()
 
         infoTextView = findViewById(R.id.infoTextView);
+        connectionInfoView = findViewById(R.id.connectionInfoView);
+        reconnectButton = findViewById(R.id.reconnectButton);
 
         upButton = findViewById(R.id.upButton);
         downButton = findViewById(R.id.downButton);
         leftButton = findViewById(R.id.leftButton);
         rightButton = findViewById(R.id.rightButton);
+
+        val blueAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (blueAdapter != null) {
+            if (blueAdapter.isEnabled) {
+                createConnection(blueAdapter);
+            } else {
+                Log.e("error", "Bluetooth is disabled.")
+            }
+        }
 
         // Create the OnTouchListener: Getting triggered, when user touches the Button
         upButton.setOnTouchListener { _, motionEvent ->
@@ -164,8 +143,59 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+        reconnectButton.setOnTouchListener { _, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    createConnection(blueAdapter)
+                    reconnectButton.isEnabled = false
+                }
+            }
+            true
+        }
     }
 
+    fun createConnection(blueAdapter: BluetoothAdapter): Boolean {
+        var result = false
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) != PackageManager.PERMISSION_GRANTED) {
+            return result
+        }
+        val bondedDevices = blueAdapter.bondedDevices
+        if (bondedDevices.size > 0) {
+            val devices = bondedDevices.toTypedArray() as Array<BluetoothDevice>
+            var device: BluetoothDevice
+            for(BD: BluetoothDevice in devices) {
+                if(BD.address == "00:21:06:BE:5D:C5")
+                {
+                    device = BD;
+                    val uuids = device.uuids
+                    val socket = device.createRfcommSocketToServiceRecord(uuids[0].uuid)
+
+                    try {
+                        socket.connect()
+                        result = true;
+                    } catch (exception: Throwable) {
+                        Log.e("error", "Connection Timeout?",exception)
+                        result = false;
+                        connectionInfoView.setText("Connection Timeout");
+                        upButton.isEnabled = false;
+                        downButton.isEnabled = false;
+                        leftButton.isEnabled = false;
+                        rightButton.isEnabled = false;
+                    }
+                    outputStream = socket.outputStream
+                    inStream = socket.inputStream
+                }
+            }
+        }
+        if(result) {
+            connectionInfoView.setText("Connected!");
+        }
+        reconnectButton.isEnabled = true
+        return result
+    }
     // Custom Print, to get Debug-output while the app is running
     // Remove when app is fully done
     private fun customPrint(value: Any?, color: Int?) {
