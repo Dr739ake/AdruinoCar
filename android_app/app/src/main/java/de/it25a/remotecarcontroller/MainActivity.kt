@@ -91,12 +91,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Up Button press")
-                    doButtonPress(Direction.Up, motionEvent)
+                    doButtonPress("up", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Up Button release")
-                    doButtonPress(Direction.Up, motionEvent)
+                    doButtonPress("up", '-')
                 }
             }
             true
@@ -105,12 +105,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Down Button press")
-                    doButtonPress(Direction.Down, motionEvent)
+                    doButtonPress("down", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Down Button release")
-                    doButtonPress(Direction.Down, motionEvent)
+                    doButtonPress("down", '-')
                 }
             }
             true
@@ -119,12 +119,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Left Button press")
-                    doButtonPress(Direction.Left, motionEvent)
+                    doButtonPress("left", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Left Button release")
-                    doButtonPress(Direction.Left, motionEvent)
+                    doButtonPress("left", '-')
                 }
             }
             true
@@ -133,12 +133,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Right Button press")
-                    doButtonPress(Direction.Right, motionEvent)
+                    doButtonPress("right", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Right Button release")
-                    doButtonPress(Direction.Right, motionEvent)
+                    doButtonPress("right", '-')
                 }
             }
             true
@@ -191,9 +191,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
         if(result) {
+            reconnectButton.isEnabled = false;
             connectionInfoView.setText("Connected!");
+            upButton.isEnabled = true;
+            downButton.isEnabled = true;
+            leftButton.isEnabled = true;
+            rightButton.isEnabled = true;
         }
-        reconnectButton.isEnabled = true
         return result
     }
     // Custom Print, to get Debug-output while the app is running
@@ -220,42 +224,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Handle the Buttons. Send data via BT here later
-    fun doButtonPress(direction: Direction, motionEvent: MotionEvent) {
-        val cmd: String;
-        when (direction) {
-            Direction.Up -> {
-                infoTextView.setTextColor(Color.MAGENTA);
-                cmd = "up"
-                outputStream.write(("+"+cmd+";").toByteArray());
-            }
+    fun doButtonPress(cmd: String, motionCommand: Char) {
+        outputStream.write((motionCommand+cmd+";").toByteArray());
 
-            Direction.Down -> {
-                infoTextView.setTextColor(Color.YELLOW);
-                cmd = "down"
-                outputStream.write(("+"+cmd+";").toByteArray());
-            }
-
-            Direction.Left -> {
-                infoTextView.setTextColor(Color.RED);
-                cmd = "left"
-                outputStream.write(("+"+cmd+";").toByteArray());
-            }
-
-            Direction.Right -> {
-                infoTextView.setTextColor(Color.GREEN);
-                cmd = "right"
-                outputStream.write(("+"+cmd+";").toByteArray());
-            }
-
-            else -> {
-                println("that should not happen. WTF?");
-                customPrint("ERROR: that should not happen. WTF?", Color.RED);
-            }
-        }
-        if (motionEvent.action == MotionEvent.ACTION_UP) {
-            infoTextView.text = "";
+        if (motionCommand == '+') {
+            infoTextView.text = cmd;
         } else {
-            infoTextView.text = direction.toString();
+            infoTextView.text = "";
         }
     }
 }
