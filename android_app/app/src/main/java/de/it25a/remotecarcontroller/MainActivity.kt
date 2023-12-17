@@ -91,12 +91,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Up Button press")
-                    doButtonPress("up", '+')
+                    doButtonPress("W", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Up Button release")
-                    doButtonPress("up", '-')
+                    doButtonPress("w", '-')
                 }
             }
             true
@@ -105,12 +105,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Down Button press")
-                    doButtonPress("down", '+')
+                    doButtonPress("S", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Down Button release")
-                    doButtonPress("down", '-')
+                    doButtonPress("s", '-')
                 }
             }
             true
@@ -119,12 +119,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Left Button press")
-                    doButtonPress("left", '+')
+                    doButtonPress("A", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Left Button release")
-                    doButtonPress("left", '-')
+                    doButtonPress("a", '-')
                 }
             }
             true
@@ -133,12 +133,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Right Button press")
-                    doButtonPress("right", '+')
+                    doButtonPress("D", '+')
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Right Button release")
-                    doButtonPress("right", '-')
+                    doButtonPress("d", '-')
                 }
             }
             true
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity() {
 
     // Handle the Buttons. Send data via BT here later
     fun doButtonPress(cmd: String, motionCommand: Char) {
-        outputStream.write((motionCommand+cmd+";").toByteArray());
+        outputStream.write( (cmd).toByteArray() );
 
         if (motionCommand == '+') {
             infoTextView.text = cmd;

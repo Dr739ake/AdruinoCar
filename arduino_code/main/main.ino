@@ -3,7 +3,7 @@
 SoftwareSerial MyBlue(2, 3);  // RX | TX
 
 #define DRIVE_SPEED 200
-#define TURN_SPEED 100
+#define TURN_SPEED 200
 
 char flag = 0;
 
@@ -21,6 +21,17 @@ char flag = 0;
 
 String cmd = "";
 
+bool movin_forward    = false;
+bool movin_backwards  = false;
+bool turnin_left      = false;
+bool turnin_right     = false;
+
+void StopDriving();
+void DriveForward();
+void DriveBackwards();
+void TurnRight();
+void TurnLeft();
+
 void setup() {
   Serial.begin(9600);
   Serial.println("Ready to connect");
@@ -35,14 +46,47 @@ void setup() {
   Serial.println("Ready to connect");
 }
 
-void DriveForward() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  analogWrite(GSM1, DRIVE_SPEED);
+void loop() {
+  if (Serial.available()) {
+    flag = Serial.read();
+    if (flag != ';') {
+      cmd += flag;
+      return;
+    }
+  }
 
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-  analogWrite(GSM2, DRIVE_SPEED);
+  if (cmd == "W") {
+    DriveForward();
+  } else if (cmd == "w") {
+    StopDriving();
+  } else if(cmd == "S") {
+    DriveBackwards();
+  } else if (cmd == "s") {
+    StopDriving();
+  } else if(cmd == "A") {
+    TurnLeft();
+  } else if (cmd == "a") {
+    StopDriving();
+  } else if(cmd == "D") {
+    TurnRight();
+  } else if (cmd == "d") {
+    StopDriving();
+  }
+  cmd = "";
+}
+
+
+void DriveForward() {
+  if(!movin_forward) {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    analogWrite(GSM1, DRIVE_SPEED);
+
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+    analogWrite(GSM2, DRIVE_SPEED);
+    movin_forward = true;
+  }
 }
 
 void StopDriving() {
@@ -53,83 +97,49 @@ void StopDriving() {
   digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
   analogWrite(GSM2, DRIVE_SPEED);
+
+  movin_forward    = false;
+  movin_backwards  = false;
+  turnin_left      = false;
+  turnin_right     = false;
 }
 
 void DriveBackwards() {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  analogWrite(GSM1, DRIVE_SPEED);
+  if(!movin_backwards) {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    analogWrite(GSM1, DRIVE_SPEED);
 
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-  analogWrite(GSM2, DRIVE_SPEED);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+    analogWrite(GSM2, DRIVE_SPEED);
+
+    movin_backwards = true;
+  }
 }
 
 void TurnRight() {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  analogWrite(GSM1, TURN_SPEED);
+  if(!turnin_right) {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    analogWrite(GSM1, TURN_SPEED);
 
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-  analogWrite(GSM2, TURN_SPEED);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+    analogWrite(GSM2, TURN_SPEED);
+    turnin_right = true;
+  }
 }
 
 void TurnLeft() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  analogWrite(GSM1, TURN_SPEED);
+  if(!turnin_left) {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    analogWrite(GSM1, TURN_SPEED);
 
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-  analogWrite(GSM2, TURN_SPEED);
-}
-
-void loop() {
-  if (MyBlue.available()) {
-    flag = MyBlue.read();
-    Serial.print(flag);
-    if (flag != ';') {
-      Serial.print(".");
-      cmd += flag;
-      return;
-    }
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+    analogWrite(GSM2, TURN_SPEED);
+  turnin_left = true;
   }
-
-// Steuerung der Motoren
-
-  // DriveForward();
-  // delay(1000);
-  // StopDriving();
-  // DriveBackwards();
-  // delay(1000);
-  // StopDriving();
-  // TurnLeft();
-  // delay(1000);
-  // StopDriving();
-  // TurnRight();
-  // delay(1000);
-  // StopDriving();
-
-
-  if (cmd == "+up") {
-    Serial.println(cmd);
-    Serial.println("+up");
-    DriveForward();
-  } else if (cmd == "-up") {
-    Serial.println(cmd);
-    Serial.println("-up");
-    StopDriving();
-  } else if(cmd == "+down") {
-    Serial.println(cmd);
-    Serial.println("+down");
-    DriveBackwards();
-  } else if(cmd == "-down") {
-    Serial.println(cmd);
-    Serial.println("-down");
-    StopDriving();
-  }
-
-
-  cmd = "";
 }
