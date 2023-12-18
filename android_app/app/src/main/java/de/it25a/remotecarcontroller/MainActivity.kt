@@ -26,13 +26,7 @@ import java.util.LinkedList
 
 class MainActivity : AppCompatActivity() {
 
-    enum class Direction {
-        Up,
-        Down,
-        Left,
-        Right
-    }
-
+    // App-Element Deklaration
     private lateinit var consoleTextView: TextView;
     private lateinit var infoTextView: TextView;
 
@@ -53,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Sicherstellen, dass das Gerät über Bluetooth verfügt
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
         {
             Toast.makeText(
@@ -63,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             return;
         }
 
-        // Find the Elements, store them in the class-Variabeles
+        // App-Elementobjekte auslesen und in den zuvor erstellten Variablen speichern, für spätere verwendung
         consoleTextView = findViewById(R.id.consoleTextView);
         consoleData = LinkedList()
 
@@ -76,8 +71,10 @@ class MainActivity : AppCompatActivity() {
         leftButton = findViewById(R.id.leftButton);
         rightButton = findViewById(R.id.rightButton);
 
+        // Erstellung des Bluetooth-Adapter Objektes
         val blueAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        // Sicherstellen, das der Adapter eingeschaltet ist
         if (blueAdapter != null) {
             if (blueAdapter.isEnabled) {
                 createConnection(blueAdapter);
@@ -86,17 +83,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Create the OnTouchListener: Getting triggered, when user touches the Button
+        // erstellung des OnTouchListener: Führt Code aus, wenn die Buttons des App-UIs gedrückt werden
         upButton.setOnTouchListener { _, motionEvent ->
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Up Button press")
-                    doButtonPress("W", '+')
+                    doButtonPress("W")
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Up Button release")
-                    doButtonPress("w", '-')
+                    doButtonPress("w")
                 }
             }
             true
@@ -105,12 +102,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Down Button press")
-                    doButtonPress("S", '+')
+                    doButtonPress("S")
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Down Button release")
-                    doButtonPress("s", '-')
+                    doButtonPress("s")
                 }
             }
             true
@@ -119,12 +116,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Left Button press")
-                    doButtonPress("A", '+')
+                    doButtonPress("A")
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Left Button release")
-                    doButtonPress("a", '-')
+                    doButtonPress("a")
                 }
             }
             true
@@ -133,12 +130,12 @@ class MainActivity : AppCompatActivity() {
             when (motionEvent.action) {
                 MotionEvent.ACTION_DOWN -> {
                     customPrint("Right Button press")
-                    doButtonPress("D", '+')
+                    doButtonPress("D")
                 }
 
                 MotionEvent.ACTION_UP -> {
                     customPrint("Right Button release")
-                    doButtonPress("d", '-')
+                    doButtonPress("d")
                 }
             }
             true
@@ -156,16 +153,19 @@ class MainActivity : AppCompatActivity() {
 
     fun createConnection(blueAdapter: BluetoothAdapter): Boolean {
         var result = false
+        // Sicherstellen, das wir die Berechtigung dazu haben, Bluetooth zu verwenden
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.BLUETOOTH_CONNECT
             ) != PackageManager.PERMISSION_GRANTED) {
             return result
         }
+        // Auslesen aller Gekoppelten Geräte
         val bondedDevices = blueAdapter.bondedDevices
         if (bondedDevices.size > 0) {
             val devices = bondedDevices.toTypedArray() as Array<BluetoothDevice>
             var device: BluetoothDevice
+            // in den gekoppelten Geräten nach dem Auto über die Mac-Adresse suchen. Wegen des Prototypen noch Statisch
             for(BD: BluetoothDevice in devices) {
                 if(BD.address == "00:21:06:BE:5D:C5")
                 {
@@ -173,11 +173,13 @@ class MainActivity : AppCompatActivity() {
                     val uuids = device.uuids
                     val socket = device.createRfcommSocketToServiceRecord(uuids[0].uuid)
 
+                    // Versuchen sich zu verbinden...
                     try {
                         socket.connect()
                         result = true;
                     } catch (exception: Throwable) {
                         Log.e("error", "Connection Timeout?",exception)
+                        // Verbindung ist fehlgeschlagen, Exception für Debuginfos anzeigen und die Steuerungsbuttons ausschalten.
                         result = false;
                         connectionInfoView.setText("Connection Timeout");
                         upButton.isEnabled = false;
@@ -190,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        if(result) {
+        if(result) { // wenn wir eine Verbindung haben, zeigen wir das so an und die App funktioniert
             reconnectButton.isEnabled = false;
             connectionInfoView.setText("Connected!");
             upButton.isEnabled = true;
@@ -200,8 +202,8 @@ class MainActivity : AppCompatActivity() {
         }
         return result
     }
-    // Custom Print, to get Debug-output while the app is running
-    // Remove when app is fully done
+    // Debugprint auf einem Element in der App
+    // Wenn Fertig, bitte entfernen
     private fun customPrint(value: Any?, color: Int?) {
         consoleData.add(value.toString())
         if (consoleData.size > 10) {
@@ -223,14 +225,8 @@ class MainActivity : AppCompatActivity() {
         customPrint(value, null);
     }
 
-    // Handle the Buttons. Send data via BT here later
-    fun doButtonPress(cmd: String, motionCommand: Char) {
+    // Verarbeite das drücken der Buttons, versende befehle über den outputstream des Bluetooth-Adapters
+    fun doButtonPress(cmd: String) {
         outputStream.write( (cmd).toByteArray() );
-
-        if (motionCommand == '+') {
-            infoTextView.text = cmd;
-        } else {
-            infoTextView.text = "";
-        }
     }
 }
